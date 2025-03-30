@@ -1,0 +1,14 @@
+requests           # For making HTTP requests to APIs
+Flask               # (Optional) If building a web application
+flask-cors         # (Optional) If handling cross-origin requests in Flask
+osmnx               # For working with OpenStreetMap data and graphs
+geopy               # For geocoding and reverse geocoding
+numpy             # For numerical computations (e.g., Haversine formula)
+pandas              # For data manipulation and analysis
+scikit-learn        # For clustering analysis
+matplotlib          # For visualizations
+networkx            # For route optimization and graph analysis
+folium            # For interactive map visualizations
+notebook
+scipy
+gdown

@@ -1,0 +1,251 @@
+/* General Styles */
+body {
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f5f5f5;
+    background-image: url(../images/login-bg.jpg);
+    background-repeat: no-repeat;
+    background-size: 100%;
+    
+  }
+  
+  header {
+    background-color: #003366;
+    padding: 10px 20px;
+  }
+  
+  .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  
+  .logo img {
+    height: 50px;
+  }
+  
+  nav a {
+    color: #ffffff;
+    text-decoration: none;
+    font-size: 16px;
+    padding: 8px 15px;
+    background-color: #FF9933; /* Saffron Orange */
+    border-radius: 5px;
+  }
+  
+  nav a:hover {
+    background-color: #ffffff;
+    color: #003366;
+  }
+  
+  /* Registration Section */
+  .register-section {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    min-height: calc(100vh - 140px); /* Adjust for header and footer height */
+    padding: 40px 20px;
+  }
+  
+  .register-container {
+    background-color: #fc7f7f18;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px;
+  }
+  
+  .register-container h2 {
+    color: #003366;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+  
+  .register-container form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .register-container label {
+    color: #333333;
+    font-weight: bold;
+  }
+  
+  .register-container input {
+    padding: 10px;
+    font-size: 1rem;
+    border: 1px solid #cccccc;
+    border-radius: 5px;
+  }
+  
+  .register-container input:focus {
+    outline: none;
+    border-color: #003366;
+  }
+  
+  .register-container button {
+    padding: 10px;
+    background-color: #003366;
+    color: #ffffff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.3s;
+  }
+  
+  .register-container button:hover {
+    background-color: #001f54;
+  }
+  
+  .register-container .login-link {
+    margin-top: 20px;
+    text-align: center;
+  }
+  
+  .register-container .login-link a {
+    color: #ff9933;
+    text-decoration: none;
+    font-weight: bold;
+  }
+  
+  .register-container .login-link a:hover {
+    color: #e0852d;
+  }
+  
+  /* Footer */
+  .footer {
+    background-color: #003366;
+    color: #ffffff;
+    padding: 20px 0;
+  }
+  
+  .footer .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+  
+  .footer h4 {
+    margin-bottom: 10px;
+  }
+  
+  .footer ul {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .footer ul li {
+    margin-bottom: 5px;
+  }
+  
+  .footer ul li a {
+    color: #ffffff;
+    text-decoration: none;
+  }
+  
+  .footer ul li a:hover {
+    text-decoration: underline;
+  }
+  
+  .footer .social-icons {
+    display: flex;
+    gap: 10px;
+  }
+  
+  .footer .social-icons .icon {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #ffffff;
+    color: #003366;
+    border-radius: 50%;
+    font-size: 1.2rem;
+    text-decoration: none;
+    transition: 0.3s;
+  }
+  
+  .footer .social-icons .icon:hover {
+    background-color: #ff9933;
+    color: #ffffff;
+  }
+  
+  .footer-bottom {
+    text-align: center;
+    padding-top: 10px;
+    font-size: 0.9rem;
+    border-top: 1px solid #ffffff;
+  }
+  
+  /* Responsive Styles */
+  @media (max-width: 768px) {
+    header {
+      flex-direction: column;
+      text-align: center;
+      padding: 15px;
+    }
+  
+    .logo img {
+      height: 40px;
+    }
+  
+    nav a {
+      font-size: 0.9rem;
+      padding: 8px 12px;
+    }
+  
+    .register-container {
+      padding: 20px;
+      max-width: 90%;
+    }
+  
+    .footer .container {
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+  
+    .footer h4 {
+      margin-bottom: 5px;
+    }
+  
+    .footer ul {
+      margin-bottom: 10px;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    nav a {
+      font-size: 0.8rem;
+      padding: 6px 10px;
+    }
+  
+    .register-container {
+      padding: 15px;
+    }
+  
+    .footer h4 {
+      font-size: 1rem;
+    }
+  
+    .footer ul li a {
+      font-size: 0.9rem;
+    }
+  
+    .footer .social-icons .icon {
+      width: 30px;
+      height: 30px;
+      font-size: 1rem;
+    }
+  }
+  

@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>User Dashboard</title>
+    <link rel="stylesheet" href="css/user-dashboard.css" />
+    <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/qrcode"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jwt-decode/build/jwt-decode.min.js"></script>
+    <script src="js/functions/dashboard-authentication.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Include Leaflet.js for map -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <!-- Include jsPDF library -->
+    
+
+  
+
+    <style>
+        #invoice {
+            display: none;
+        }
+        #qr-code {
+            margin-top: 10px;
+        }
+      /* Ensure the map takes the full height of the window or container */
+      #map {
+          height: 400px; /* Fixed height to ensure it fills the space */
+          width: 100%;   /* Full width of the parent container */
+          border-radius: 8px;
+      }
+  </style>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+   
+    <header class="header">
+      <div class="logo">
+        <img src="images/mainlogo.jpg" alt="Logo" />
+      </div>
+      <nav class="nav">
+        <!-- Desktop Navigation -->
+        <ul class="nav-links">
+          <li><a href="#help">Help</a></li>
+          <li><a href="#contact">Contact</a></li>
+          <li class="profile-dropdown">
+            <div class="profile" id="profile-btn">
+              <i class="fas fa-user-circle"></i>
+              <span>Username</span>
+              <i class="fas fa-chevron-down"></i>
+            </div>
+            <ul class="dropdown-menu" id="dropdown-menu">
+              <li><a href="#my-profile">My Profile</a></li>
+              <li><a href="#change-password">Change Password</a></li>
+              <li><button id="logoutBtn">Logout</button></li>
+            </ul>
+          </li>
+        </ul>
+        <!-- Hamburger Menu -->
+        <button class="hamburger" id="hamburger">
+          <i class="fas fa-bars"></i>
+        </button>
+        <ul class="mobile-nav" id="mobile-nav">
+          <li><a href="#help">Help</a></li>
+          <li><a href="#contact">Contact</a></li>
+          <li><a href="#my-profile">My Profile</a></li>
+          <li><a href="#change-password">Change Password</a></li>
+          <li>
+            <a href="#logout"
+              ><button
+                style="
+                  background-color: red;
+                  padding: 10px;
+                  border-radius: 5px;
+                  color: whitesmoke;
+                  font-size: 15px;
+                "
+              >
+                Logout
+              </button></a
+            >
+          </li>
+        </ul>
+      </nav>
+    </header>
+    <div class="dashboard">
+      <!-- Sidebar -->
+      <nav class="side-bar">
+        <h2>Dashboard</h2>
+        <ul>
+          <li><a href="#">My Profile</a></li>
+          <li><a href="#current-orders">Current Order</a></li>
+          <li><a href="#orders-for-me">Order Booked for Me</a></li>
+          <li><a href="#past-orders">Past Orders</a></li>
+          
+        </ul>
+      </nav>
+
+      <!-- Main Content -->
+      <div class="main-content">
+        <header>
+          <h1>User Dashboard</h1>
+            <button class="book-btn" onclick="openForm()">Book Consignment</button>
+        </header>
+
+        <section class="table-section">
+          <!-- Current Order Table -->
+          <div class="table-wrapper">
+              <h2>Current Orders</h2>
+              <table id="current-orders">
+                  <thead>
+                      <tr>
+                          <th>Consignment ID</th>
+                          <th>Sender Pincode</th>
+                          <th>Receiver Pincode</th>
+                          <th>Status</th>
+                          <th>Delivery Date</th>
+                          <th>Action</th>
+                      </tr>
+                  </thead>
+                  <tbody></tbody>
+              </table>
+          </div>
+      
+          <!-- Orders Booked for Me Table -->
+          <div class="table-wrapper">
+              <h2>Orders Booked for Me</h2>
+              <table id="orders-for-me">
+                  <thead>
+                      <tr>
+                        <th>Consignment ID</th>
+                        <th>Sender Pincode</th>
+                        <th>Receiver Pincode</th>
+                        <th>Status</th>
+                        <th>Delivery Date</th>
+                        <th>Action</th>
+                        <th>Change Slot</th>
+                      </tr>
+                  </thead>
+                  <tbody></tbody>
+              </table>
+          </div>
+      </section>
+      
+      <!-- Past Order Table -->
+      <div class="table-wrapper">
+        <h2>Past Orders</h2>
+        <table id="past-orders">
+            <thead>
+                <tr>
+                    <th>Consignment ID</th>
+                    <th>Sender Pincode</th>
+                    <th>Receiver Pincode</th>
+                    <th>Status</th>
+                    <th>Delivery Date</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+      
+    <!-- Popup for Detailed View -->
+<div id="popup" class="popup fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center z-50 hidden">
+  <div class="popup-content bg-white p-6 rounded-lg shadow-lg w-11/12 sm:w-96 relative">
+      <!-- Close button -->
+      <button id="close-popup" class="close-btn text-gray-500 text-3xl absolute top-2 right-2 hover:text-gray-800">
+          &times;
+      </button>
+      
+      <!-- Title -->
+      <h2 class="text-2xl font-semibold text-center mb-4">Consignment Details</h2>
+      
+      <!-- Order Details will be dynamically inserted here -->
+      <div id="order-details" class="space-y-4">
+          <!-- Dynamic content goes here -->
+      </div>
+  </div>
+</div>
+
+
+    <!-- Add consigment form -->
+    <div id="consignmentForm" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
+      <div class="bg-white rounded-lg shadow-lg w-full max-w-2xl p-6 space-y-6">
+  
+          <!-- Sender Details Section -->
+<div id="senderDetails" class="form-section space-y-4">
+  <h2 class="text-xl font-bold text-gray-800">Sender Details</h2>
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div>
+          <label for="senderName" class="block text-gray-600">Full Name</label>
+          <input type="text" id="senderName" class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-600" placeholder="Enter full name">
+      </div>
+      <div>
+          <label for="senderPhone" class="block text-gray-600">Phone Number</label>
+          <input type="text" id="senderPhone" class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-600" placeholder="Enter phone number">
+      </div>
+  </div>
+  <div>
+    <label for="senderAddress" class="block text-gray-600">Address</label>
+    <input type="text" id="senderAddress" class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-600" placeholder="coordinates" readonly>
+  </div>
+  <!-- Get Current Location Button -->
+<button id="getLocations" class="bg-blue-500 text-white px-4 py-2 rounded mt-4">Get Current Location</button>
+
+  <script>
+    // Function to get current location based on IP using ip-api service
+    function getCurrentLocations() {
+        fetch('http://ip-api.com/json')
+            .then(response => response.json())
+            .then(data => {
+                let lat = data.lat;
+                let lng = data.lon;
+                
+                // Store latitude and longitude in variables
+                let currentLats = lat;
+                let currentLngs = lng;
+  
+                // Update the input field with current location
+                document.getElementById('senderAddress').value = `${currentLats},${currentLngs}`;
+            })
+            .catch(error => {
+                console.error('Error getting location:', error);
+            });
+    }
+  
+    // Button to get current location
+    document.getElementById('getLocations').addEventListener('click', getCurrentLocations);
+  </script>
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div>
+          <label for="senderPincode" class="block text-gray-600">Pincode</label>
+          <div class="flex space-x-2">
+              <input type="text" id="senderPincode" class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-600" placeholder="Enter pincode">
+              <button id="validatePincodeSender" class="px-4 py-2 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition" onclick="validatePincode('sender')">
+                  Validate
+              </button>
+          </div>
+      </div>
+      <div>
+          <label for="senderPostOffice" class="block text-gray-600">Post Office</label>
+          <select id="senderPostOffice" class="w-full border rounded-lg px-3 py-2"></select>
+      </div>
+  </div>
+  <div id="loadingOverlay" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div class="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+  </div>
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div>
+          <label for="senderState" class="block text-gray-600">State</label>
+          <input type="text" id="senderState" disabled class="w-full border rounded-lg px-3 py-2 bg-gray-200" placeholder="State (auto-filled)">
+      </div>
+      <div>
+          <label for="senderDistrict" class="block text-gray-600">District</label>
+          <input type="text" id="senderDistrict" disabled class="w-full border rounded-lg px-3 py-2 bg-gray-200" placeholder="District (auto-filled)">
+      </div>
+  </div>
+  <div class="flex justify-between">
+      <button class="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition" onclick="nextSection('senderDetails', 'receiverDetails')">
+          Next
+      </button>
+  </div>
+</div>
+
+<!-- Receiver Details Section -->
+<div id="receiverDetails" class="form-section space-y-4 hidden">
+  <h2 class="text-xl font-bold text-gray-800">Receiver Details</h2>
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div>
+          <label for="receiverName" class="block text-gray-600">Full Name</label>
+          <input type="text" id="receiverName" class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-600" placeholder="Enter full name">
+      </div>
+      <div>
+          <label for="receiverPhone" class="block text-gray-600">Phone Number</label>
+          <input type="text" id="receiverPhone" class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-600" placeholder="Enter phone number">
+      </div>
+  </div>
+ <!-- Address Section -->
+ <div>
+  <label for="receiverAddress" class="block text-gray-600">Address</label>
+  <div id="map" class="mb-4"></div>
+  <input type="text" id="receiverAddress" class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-600" placeholder="coordinates" readonly>
+</div>
+
+<!-- Store Lat and Lng -->
+<script>
+  let map, marker;
+  let currentLat = null;
+  let currentLng = null;
+
+  // Initialize the map
+  function initMap(lat = 28.650700184483235, lng = 77.17016581445934) {
+      map = L.map('map').setView([lat, lng], 13); // Set default coordinates
+
+      // Add OpenStreetMap tiles to the map
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+      }).addTo(map);
+
+      // Add marker
+      marker = L.marker([lat, lng]).addTo(map);
+
+      // Handle map click to update marker and lat/lng input
+      map.on('click', function (e) {
+          const latLng = e.latlng;
+          marker.setLatLng(latLng);
+          currentLat = latLng.lat;
+          currentLng = latLng.lng;
+
+          // Update the input field with a simple location
+          document.getElementById('receiverAddress').value = `${currentLat},${currentLng}`;
+      });
+  }
+  // Initialize map with a default location (London, for example)
+  window.onload = () => {
+      initMap();
+  };
+</script>
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div>
+          <label for="receiverPincode" class="block text-gray-600">Pincode</label>
+          <div class="flex space-x-2">
+              <input type="text" id="receiverPincode" class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-600" placeholder="Enter pincode">
+              <button id="validatePincodeReceiver" class="px-4 py-2 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition" onclick="validatePincode('receiver')">
+                  Validate
+              </button>
+          </div>
+      </div>
+      <div id="loadingOverlayr" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+    </div>
+      <div>
+          <label for="receiverPostOffice" class="block text-gray-600">Post Office</label>
+          <select id="receiverPostOffice" class="w-full border rounded-lg px-3 py-2"></select>
+      </div>
+  </div>
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div>
+          <label for="receiverState" class="block text-gray-600">State</label>
+          <input type="text" id="receiverState" disabled class="w-full border rounded-lg px-3 py-2 bg-gray-200" placeholder="State (auto-filled)">
+      </div>
+      <div>
+          <label for="receiverDistrict" class="block text-gray-600">District</label>
+          <input type="text" id="receiverDistrict" disabled class="w-full border rounded-lg px-3 py-2 bg-gray-200" placeholder="District (auto-filled)">
+      </div>
+  </div>
+  <div class="flex justify-between">
+      <button class="px-4 py-2 bg-gray-600 text-white font-semibold rounded-lg hover:bg-gray-700 transition" onclick="previousSection('receiverDetails', 'senderDetails')">
+          Previous
+      </button>
+      <button class="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition" onclick="populatePickupDates()">
+          Next
+      </button>
+  </div>
+</div>
+
+  
+          <!-- Pickup Details Section -->
+          <div id="pickupDetails" class="form-section space-y-4 hidden">
+            <h2 class="text-xl font-bold text-gray-800">Pickup Details</h2>
+            <div>
+                <label for="pickupDate" class="block text-gray-600">Pickup Date</label>
+                <select id="pickupDate" class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-600">
+                    <!-- Options populated by JavaScript -->
+                </select>
+            </div>
+            <div>
+                <label for="priceDetails" class="block text-gray-600">Price Details</label>
+                <input type="text" id="priceDetails" disabled class="w-full border rounded-lg px-3 py-2 bg-gray-200" placeholder="100">
+            </div>
+    
+            <div class="flex justify-between">
+                <button class="px-4 py-2 bg-gray-600 text-white font-semibold rounded-lg hover:bg-gray-700 transition" onclick="previousSection('pickupDetails', 'receiverDetails')">
+                    Previous
+                </button>
+                <button 
+                  type="button" 
+                  class="px-4 py-2 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition" 
+                  onclick="showDeliveryDate()">
+                  Next
+                </button>
+            </div>
+        </div>
+          
+          <!-- Ai Slot prediction and asking sender to choose preffered time slot -->
+          <div id="recommendedSlot" class="form-section space-y-4 hidden">
+            <h2 class="text-xl font-bold text-gray-800">Date and Time Slot Details</h2>
+            <div>
+                
+                <div>
+                  <label for="DeliveryDate" class="block text-gray-600">Expected Delivery Date: </label>
+                  <input type="text" id="DeliveryDatet" disabled class="w-full border rounded-lg px-3 py-2 bg-gray-200" placeholder="">
+                  <p type="text", id="deliverydatett" class="hidden">
+              
+                  </p>
+              </div>
+              <div>
+                <label for="recommended_Slot" class="block text-gray-700 font-medium mb-2">Recommended Time Slot:</label>
+                <button 
+                type="button" 
+                id="recommendedButton" 
+                onclick="handleRecommendedSelection()" 
+                class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 focus:ring-2 focus:ring-blue-300 focus:outline-none">
+                12:00 PM - 3:00 PM
+              </button>
+              </div>
+            
+            </div>
+            <label for="timeSlotDropdown" class="block text-gray-700 font-medium mb-2">Want to change the Time slot?, Select a Time Slot:</label>
+            <select 
+              id="timeSlotDropdown" 
+              name="timeSlot" 
+              onchange="handleDropdownChange()" 
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-300 focus:outline-none">
+              <option value="">-- Select a Time Slot --</option>
+              <option value="9am-12pm">9:00 AM - 12:00 PM</option>
+              <option value="12pm-3pm">12:00 PM - 3:00 PM</option>
+              <option value="3pm-6pm">3:00 PM - 6:00 PM</option>
+              <option value="6pm-9pm">6:00 PM - 9:00 PM</option>
+            </select>
+            <p type="text", id="selectedslot" class="hidden">
+              
+              </p>
+            <button id="resettimeslot" class="px-4 py-2 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition" onclick="reset()">
+              Reset
+          </button>
+            <div class="flex justify-between">
+                <button class="px-4 py-2 bg-gray-600 text-white font-semibold rounded-lg hover:bg-gray-700 transition" onclick="previousSection('recommendedSlot', 'pickupDetails')">
+                    Previous
+                </button>
+                <button class="px-4 py-2 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition" id="submitConsignmentForm">
+                    Submit
+                </button>
+            </div>
+        </div>
+        </div>
+      </div>  
+  
+    <!-- Footer section -->
+   <!-- Overlay for the popup -->
+   
+    <footer>
+      <div class="footer-container">
+        <!-- About Us Section -->
+        <div class="footer-section about-us">
+          <h3>About Us</h3>
+          <p>
+            We specialize in providing customized delivery services that fit
+            your schedule. With our AI-powered platform, you can pick the time
+            that works best for you.
+          </p>
+        </div>
+        <!-- Quick Links Section -->
+        <div class="footer-section quick-links">
+          <h3>Quick Links</h3>
+          <ul>
+            <li><a href="#services">Our Services</a></li>
+            <li><a href="#about-us">About Us</a></li>
+            <li><a href="#contact-us">Contact Us</a></li>
+            <li><a href="#">Privacy Policy</a></li>
+            <li><a href="#">Terms & Conditions</a></li>
+          </ul>
+        </div>
+        <!-- Social Links Section -->
+        <div class="footer-section social-links">
+          <h3>Follow Us</h3>
+          <div class="social-icons">
+            <a href="#"><i class="fab fa-facebook-f"></i></a>
+            <a href="#"><i class="fab fa-twitter"></i></a>
+            <a href="#"><i class="fab fa-instagram"></i></a>
+            <a href="#"><i class="fab fa-linkedin-in"></i></a>
+          </div>
+        </div>
+        <!-- Newsletter Section -->
+        <div class="footer-section newsletter">
+          <h3>Subscribe to Our Newsletter</h3>
+          <p>Stay updated with the latest delivery services and offers.</p>
+          <form>
+            <input type="email" placeholder="Enter your email" required />
+            <button type="submit">Subscribe</button>
+          </form>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2024 Your Delivery Service. All Rights Reserved.</p>
+      </div>
+    </footer>
+
+    <script src="js/styling/user_dashboard.js"></script>
+    <script src="js/functions/consignment_booking.js"></script>
+    <script src="js/functions/dashboard_data_fetch.js"></script>
+    <script src="js/functions/logout.js"></script>
+    <script src="js/functions/consigment_sending_to_db.js"></script>
+  </body>
+</html>
